@@ -1,14 +1,9 @@
-import re
-from typing import Optional
-from pydantic import BaseModel, NumberNotGeError
+from pydantic import BaseModel
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-from fastapi import FastAPI, Path, Request
-from typing import Optional
+from fastapi import FastAPI, Request
 from twilio.rest import Client
-
-
 
 app = FastAPI()
 
@@ -23,57 +18,76 @@ from_="+18449023426"
         # An +E.164 number that's initiating this execution. This is your Twilio phone number
 
 
+db = firestore.client()
+
 class Item(BaseModel):
     tag_id: str
     number: int
     plate: str
 
+class Tag(BaseModel):
+    tag_id: str
 
-@app.post("/add_user/")
+#  route for adding user to the database
+@app.post("/add_user")
 async def upload(item: Item):
 
-    db = firestore.client()
-
-    doc_ref = db.collection(u'cardata').document()
+    doc_ref = db.collection(u'cardata').document(item.tag_id)
+    doc = doc_ref.get()
+    if doc.exists: return {"message": "Aldready Present"}
     doc_ref.set({
         u'tag_id': item.tag_id,
         u'number': item.number,
         u'plate': item.plate,
     })
 
-    return "Entry Added"
+    return {"message" : "Entry Added"}
 
-@app.post("/get_number/")
-async def upload(tag_id: str):
+# getting the number of a particular user
+# @app.post("/get_number")
+# async def upload(tag: Tag):
 
-    db = firestore.client()
+#     db = firestore.client()
 
-    # Create a reference to the cities collection
-    tag_ref = db.collection(u'cardata')
+#     # Create a reference to the cities collection
+#     tag_ref = db.collection(u'cardata')
 
-    # Create a query against the collection
-    docs = tag_ref.where(u'tag_id', u'==', tag_id).stream()
+#     # Create a query against the collection
+#     docs = tag_ref.where(u'tag_id', u'==', tag.tag_id).stream()
 
-    for doc in docs:
-        doc_to_dict = doc.to_dict()
-        number = doc_to_dict['number']
+#     for doc in docs:
+#         doc_to_dict = doc.to_dict()
+#         number = doc_to_dict['number']
 
-    print(number)
-    return number
-
-
-@app.post("/send_message/")
-async def upload(number: int):
+#     print(number)
+#     return {"mobile_number" : number}
 
 
-    # to = "whatsapp:+91"+str(number)
-    to = "+91"+str(number)
-    from_="+18449023426"
-    client = Client(account_sid, auth_token)
-    client.studio.v2.flows(flow_id).executions.create(to=to, from_=from_)
+# send message to a user based on the tag id
+@app.post("/send_message")
+async def upload(tag: Tag):
 
-@app.post("/response/")
+    doc_ref = db.collection(u'cardata').document(tag.tag_id)
+    doc = doc_ref.get()
+
+    print(doc)
+
+    if doc.exists:
+        number = doc.get("number")
+        # to = "whatsapp:+91"+str(number)
+        to = "+91"+str(number)
+        from_="+18449023426"
+        client = Client(account_sid, auth_token)
+        client.studio.v2.flows(flow_id).executions.create(to=to, from_=from_)
+    else: pass
+
+    return { "message" : "send message"}
+
+
+# ??
+@app.post("/response")
 async def get_body(request: Request):
 
     print(request.json())
-    return await request.json()
+    res = await request.json()
+    return res
