@@ -34,7 +34,7 @@ async def upload(item: Item):
 
     doc_ref = db.collection(u'cardata').document(item.tag_id)
     doc = doc_ref.get()
-    if doc.exists: return {"message": "Aldready Present"}
+    if doc.exists: return {"message": "Already Present"}
     doc_ref.set({
         u'tag_id': item.tag_id,
         u'number': item.number,
