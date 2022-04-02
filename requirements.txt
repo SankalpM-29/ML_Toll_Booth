@@ -58,3 +58,4 @@ watchgod==0.8.1
 websockets==10.2
 wincertstore==0.2
 zipp==3.7.0
+stripe>=2.48.0,<3.0
