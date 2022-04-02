@@ -84,10 +84,15 @@ async def upload(tag: Tag):
     return { "message" : "send message"}
 
 
-# ??
+
 @app.post("/response")
 async def get_body(request: Request):
 
     print(request.json())
     res = await request.json()
     return res
+
+@app.get("/demo")
+async def demo():
+
+    return "Successfully accessed path"
