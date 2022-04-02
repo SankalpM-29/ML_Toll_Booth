@@ -1,24 +1,24 @@
+from functools import lru_cache
+import os
 from pydantic import BaseModel
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from twilio.rest import Client
-
-app = FastAPI()
+import stripe
+from dotenv import load_dotenv
 
 cred = credentials.Certificate('./toll-booth.json')
 firebase_admin.initialize_app(cred)
 
-account_sid = "AC526b5b287c6306a4dc3f6c1e4779f5a8" # Enter your Account SID from twilio.com/console here
-auth_token  = "abb60c1549593a21ceecf72a01c44004" # Enter your Auth Token from twilio.com/console here
-flow_id = "FW5a469d7b65d21defe74021c8f33c436c"     # Find the Flow ID value from the trigger's REST API URL          # An +E.164 number that we'll be dialing. The unemployment office in my case!
-# from_="whatsapp:+18449023426" 
-from_="+18449023426" 
-        # An +E.164 number that's initiating this execution. This is your Twilio phone number
-
-
+app = FastAPI()
+env = load_dotenv()
 db = firestore.client()
+
+# stripe config
+stripe.api_version = '2020-08-27'
+stripe.api_key = os.environ.get('STRIPE_API_KEY')
 
 class Item(BaseModel):
     tag_id: str
@@ -77,12 +77,38 @@ async def upload(tag: Tag):
         # to = "whatsapp:+91"+str(number)
         to = "+91"+str(number)
         from_="+18449023426"
-        client = Client(account_sid, auth_token)
-        client.studio.v2.flows(flow_id).executions.create(to=to, from_=from_)
+        client = Client(os.environ.get("ACCOUNT_SID"), os.environ.get("AUTH_TOKEN"))
+        client.studio.v2.flows(os.environ.get("FLOW_ID")).executions.create(to=to, from_=from_)
     else: pass
 
     return { "message" : "send message"}
 
+# stripe payment api
+@app.post("/pay")
+async def pay():
+    # write your stripe code here
+    stripe.api_key = os.environ.get('STRIPE_API_KEY')
+    customer = stripe.Customer.retrieve('cus_LQSbRmECb2onEY')
+
+    stripe.PaymentIntent.create(
+        amount=20,
+        currency='inr',
+        customer=customer['id'],
+        payment_method_types=['customer_balance'],
+        payment_method_data={
+            "type": "customer_balance",
+        },
+        payment_method_options={
+            "customer_balance": {
+                "funding_type": "bank_transfer",
+                "bank_transfer": {
+                    "type": "jp_bank_transfer",
+                },
+            },
+        },
+        confirm=True,
+    )
+    return
 
 # ??
 @app.post("/response")
