@@ -1,6 +1,48 @@
 # FastAPI server for Number Plate Recognition
 A server using TFOD2 custom trained model to localize on the numberplate in an image and after that using Cloud Vision API to extract characters from the image.
 
+
+## Project Structure
+```bash
+├───ANPR_centernet_resnet50_model
+│   ├───checkpoint
+│   └───saved_model
+│       ├───assets
+│       └───variables
+├───object_detection
+├───image_to_text.py
+├───label_map.pbtxt
+├───requirements.txt
+├───stripe_customer.py
+├───translation-322819-fd44443f9785.json
+└───official
+```
+
+## Demo
+
+<figure>
+    <figcaption>car image</figcaption>
+    <img src="data/car.jpg"
+         alt="car image" width="600" height="450">
+    
+</figure>
+
+<figure>
+    <figcaption>created upload page</figcaption>
+    <img src="data/upload_page.png"
+         alt="upload page" width="600" height="400">
+    
+</figure>
+
+<figure>
+    <figcaption>output of numberplate</figcaption>
+    <img src="data/output.png"
+         alt="output for numberplate" width="600" height="400">
+    
+</figure>
+
+>  To use the object detection model, we need "official" folder from [official](https://github.com/tensorflow/models) and "object_detection" folder from [object_detection](https://github.com/tensorflow/models/tree/master/research)
+
 ## Run Locally
 
 1. Create a virtual env using any python version >= 3.7.
@@ -26,7 +68,7 @@ apt update
   ```bash
 apt-get install python3-pip
 ```
-Ideally it's advised to create a virtual python environment and then install all the packages. 
+> :memo: **Note:** Ideally it's advised to create a virtual python environment and then install all the packages. 
 
 4. Install the required dependencies and run the following command in the project folder:
 ```bash
