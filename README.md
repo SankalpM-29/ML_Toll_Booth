@@ -10,6 +10,10 @@ uvicorn main:app --reload
 
 2. To test apis, visit the route /docs in your browser 
 
+## Block Diagram
+
+<img src="data/new_block.png" width="650" height="500">
+
 ## Api Calls
 
 | Route | description | body |
