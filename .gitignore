@@ -7,3 +7,4 @@ python_server/official
 python_server/translation-322819-fd44443f9785.json
 toll-booth.json
 .envs
+.env
