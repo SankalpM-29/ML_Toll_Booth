@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=root
 Group=root
-WorkingDirectory=/app/ocr_detect/
+WorkingDirectory=/app/python_server/
 ExecStart=/usr/local/bin/gunicorn -w 2 -k uvicorn.workers.UvicornWorker image_to_text:app --bind 0.0.0.0:8000 --reload
 
 [Install]
