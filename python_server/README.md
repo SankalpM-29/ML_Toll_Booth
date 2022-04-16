@@ -63,6 +63,7 @@ uvicorn image_to_text:app --port 8000 --host 0.0.0.0
  ```bash
 apt update
 ```
+
 2. Create a project folder. Our folder lies at /app/python_server. Use scp command to transfer files to VM or clone this repo using git.
 
 3. We are going to use python3 which comes preinstalled in most linux VMs. But we need to install pip separately using:
