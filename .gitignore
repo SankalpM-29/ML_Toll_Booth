@@ -1,3 +1,8 @@
 __pycache__/
 env
 CNN_model/
+python_server/ANPR_centernet_resnet50_model
+python_server/object_detection
+python_server/official
+python_server/translation-322819-fd44443f9785.json
+toll-booth.json
