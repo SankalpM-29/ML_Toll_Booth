@@ -41,6 +41,7 @@ A server using TFOD2 custom trained model to localize on the numberplate in an i
     
 </figure>
 
+
 >  To use the object detection model, we need "official" folder from [official](https://github.com/tensorflow/models) and "object_detection" folder from [object_detection](https://github.com/tensorflow/models/tree/master/research)
 
 ## Run Locally
