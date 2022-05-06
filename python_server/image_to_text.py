@@ -128,6 +128,7 @@ async def get_data(request: Request):
         x = requests.post(url, json = image)
 
         return "Sent Successfully"
+        
     except:
         print("Image not detected")
         return "Image is not proper!!!!!"
