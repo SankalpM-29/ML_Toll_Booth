@@ -65,69 +65,72 @@ async def get_data(request: Request):
 
     width = image_np.shape[1]
     height = image_np.shape[0]
+    try:
+        for idx, box in enumerate(boxes):
+            roi = box*[height, width, height, width]
+            region = image_np[int(roi[0]):int(roi[2]),int(roi[1]):int(roi[3])]
+        
+        color_coverted = cv2.cvtColor(region, cv2.COLOR_BGR2RGB)
+        
+        cropped_image = Image.fromarray(region)
 
-    for idx, box in enumerate(boxes):
-        roi = box*[height, width, height, width]
-        region = image_np[int(roi[0]):int(roi[2]),int(roi[1]):int(roi[3])]
-      
-    color_coverted = cv2.cvtColor(region, cv2.COLOR_BGR2RGB)
-      
-    cropped_image = Image.fromarray(region)
+        cropped_image.save("cropped_image.jpg")
 
-    cropped_image.save("cropped_image.jpg")
+        cropped_image_path = "./cropped_image.jpg"
 
-    cropped_image_path = "./cropped_image.jpg"
+        client = vision.ImageAnnotatorClient()
 
-    client = vision.ImageAnnotatorClient()
+        with io.open(cropped_image_path, 'rb') as image_file:
+            content = image_file.read()
 
-    with io.open(cropped_image_path, 'rb') as image_file:
-        content = image_file.read()
+        image = vision.Image(content=content)
 
-    image = vision.Image(content=content)
+        response = client.text_detection(image=image)
+        texts = response.text_annotations
 
-    response = client.text_detection(image=image)
-    texts = response.text_annotations
+        if response.error.message:
+            raise Exception(
+                    '{}\nFor more info on error messages, check: '
+                    'https://cloud.google.com/apis/design/errors'.format(
+                        response.error.message))
 
-    if response.error.message:
-        raise Exception(
-                '{}\nFor more info on error messages, check: '
-                'https://cloud.google.com/apis/design/errors'.format(
-                    response.error.message))
+        full_text = texts[0].description
+        # print(texts)
+        # print(full_text)
+        if full_text.count('\n') == 1:
+            plate1 = full_text.replace('\n', '')
+            # print(plate1)
+        # print(texts)
 
-    full_text = texts[0].description
-    # print(texts)
-    # print(full_text)
-    if full_text.count('\n') == 1:
-        plate1 = full_text.replace('\n', '')
-        # print(plate1)
-    # print(texts)
+        if full_text.count('\n') > 1:
+            rectangle_size = response.full_text_annotation.pages[0].width*response.full_text_annotation.pages[0].height
+            # print(rectangle_size)
+            region_threshold = 0.05
+            plate = [] 
+            for result in texts[1:]:
+                length = np.sum(np.subtract(result.bounding_poly.vertices[1].x, result.bounding_poly.vertices[0].x))
+                height = np.sum(np.subtract(result.bounding_poly.vertices[3].y, result.bounding_poly.vertices[0].y))
 
-    if full_text.count('\n') > 1:
-        rectangle_size = response.full_text_annotation.pages[0].width*response.full_text_annotation.pages[0].height
-        # print(rectangle_size)
-        region_threshold = 0.05
-        plate = [] 
-        for result in texts[1:]:
-            length = np.sum(np.subtract(result.bounding_poly.vertices[1].x, result.bounding_poly.vertices[0].x))
-            height = np.sum(np.subtract(result.bounding_poly.vertices[3].y, result.bounding_poly.vertices[0].y))
+                # print((length*height) / rectangle_size)    
+                if ((length*height) / rectangle_size) > region_threshold:
+                    plate.append(result.description) 
 
-            # print((length*height) / rectangle_size)    
-            if ((length*height) / rectangle_size) > region_threshold:
-                plate.append(result.description) 
+            plate1 = ''.join(plate)
+            # print(plate1)
 
-        plate1 = ''.join(plate)
-        # print(plate1)
+        plate1 = plate1.replace('\n', '')
+        plate1 = plate1.replace(' ', '')
+        
 
-    plate1 = plate1.replace('\n', '')
-    plate1 = plate1.replace(' ', '')
-    
+        url = "http://enigmatic-thicket-80643.herokuapp.com/api/vehicle/vehiclePlate"
+        print("Image Detected")
+        image = {"plate": plate1}
+        x = requests.post(url, json = image)
 
-    url = "https://cashiers-able-focal-conducted.trycloudflare.com/api/vehicle/vehiclePlate"
-
-    image = {"plate": plate1}
-    x = requests.post(url, json = image)
-
-    return "Sent Successfully"
+        return "Sent Successfully"
+    except:
+        print("Image not detected")
+        return "Image is not proper!!!!!"
 
 @app.post("/get_number")
 async def create_upload_files(request: Request):
