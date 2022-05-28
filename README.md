@@ -21,7 +21,7 @@ A server using TFOD2 custom trained model to localize on the numberplate in an i
 
 
 ## Project Structure
--> <h3> For Python Server
+-> <h3> For Python Server </h3>
 ```bash
 ├───ANPR_centernet_resnet50_model
 │   ├───checkpoint
