@@ -9,19 +9,14 @@
 ## Flowchart
 
 <img src="data/flowchart1.png" width="650" height="500">
-<!-- ## Api Calls
-
-| Route | description | body |
-|:---:|:---:|:---:|
-|/add_user|new users can register into the database|tag_id, number, plate|
-|/send_message|send message to a user based on the tag id|tag_id| -->
 
 ## FastAPI server for Number Plate Recognition
 A server using TFOD2 custom trained model to localize on the numberplate in an image and after that using Cloud Vision API to extract characters from the image.
 
 
 ## Project Structure
--> <h3> For Python Server </h3>
+<h3> For Python Server </h3>
+
 ```bash
 ├───ANPR_centernet_resnet50_model
 │   ├───checkpoint
@@ -41,21 +36,21 @@ A server using TFOD2 custom trained model to localize on the numberplate in an i
 
 <figure>
     <figcaption><h2>car image</h2></figcaption>
-    <img src="data/car.jpg"
+    <img src="python_server/data/car.jpg"
          alt="car image" width="600" height="450">
     
 </figure>
 
 <figure>
     <figcaption><h2>created upload page</h2></figcaption>
-    <img src="data/upload_page.png"
+    <img src="python_server/data/upload_page.png"
          alt="upload page" width="600" height="400">
     
 </figure>
 
 <figure>
     <figcaption><h2>output of numberplate</h2></figcaption>
-    <img src="data/output.png"
+    <img src="python_server/data/output.png"
          alt="output for numberplate" width="600" height="400">
     
 </figure>
