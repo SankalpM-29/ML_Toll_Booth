@@ -224,7 +224,7 @@ async def create_upload_files(request: Request):
         """
     return HTMLResponse(content=content)
 
-
+# page to upload file
 @app.get("/upload_file")
 async def main():
     content = """
